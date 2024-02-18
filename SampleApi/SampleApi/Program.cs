@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using Hellang.Middleware.ProblemDetails;
+using SampleApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,12 +9,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(x =>
 {
-    x.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "SampleApi", Version = "v1"
-    });
+    x.SwaggerDoc("v1",
+        new OpenApiInfo
+        {
+            Title = "SampleApi", 
+            Version = "v1",
+            Description = "A simple example ASP.NET Core Web API for demonstrating Swagger to Postman collection conversion.",
+        });
+
+    var filePath = Path.Combine(AppContext.BaseDirectory, "SampleApi.xml");
+    x.IncludeXmlComments(filePath);
 });
 builder.Services.AddControllers();
+builder.Services.AddSingleton<ItemsService>();
 builder.Services.AddProblemDetails(options =>
 {
     // Only include exception details in a development environment. There's really no need

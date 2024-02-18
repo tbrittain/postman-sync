@@ -1,35 +1,36 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SampleApi.Models;
+using SampleApi.Services;
 
 namespace SampleApi.Controllers;
 
+/// <summary>
+/// Items controller is a simple CRUD controller for items.
+/// </summary>
+/// <param name="itemsService"></param>
 [ApiController]
 [Route("[controller]")]
-public class ItemsController : ControllerBase
+public class ItemsController(ItemsService itemsService) : ControllerBase
 {
-    private readonly ConcurrentDictionary<Guid, Item> _items = new();
-
-    public ItemsController()
-    {
-        for (var i = 0; i < 5; i++)
-        {
-            var id = Guid.NewGuid();
-            var item = new Item(id, $"Item {i}", $"Description {i}", DateTime.Now, null);
-            _items.TryAdd(id, item);
-        }
-    }
-
+    /// <summary>
+    /// Retrieves all items.
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Item>), 200)]
     public async Task<ActionResult<IEnumerable<Item>>> Get()
     {
         await Task.Delay(10);
 
-        var items = _items.Values.OrderBy(x => x.CreatedAt).ToList();
+        var items = itemsService.GetItems();
         return Ok(items);
     }
 
+    /// <summary>
+    /// Gets a single item by its id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(Item), 200)]
     [ProducesResponseType(404)]
@@ -37,14 +38,17 @@ public class ItemsController : ControllerBase
     {
         await Task.Delay(10);
 
-        if (_items.TryGetValue(id, out var item))
-        {
-            return Ok(item);
-        }
-
-        return NotFound();
+        var item = itemsService.GetItem(id);
+        if (item is null) return NotFound();
+        
+        return Ok(item);
     }
 
+    /// <summary>
+    /// Adds a new item.
+    /// </summary>
+    /// <param name="postItemRequest"></param>
+    /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(Item), 201)]
     [ProducesResponseType(400)]
@@ -57,11 +61,17 @@ public class ItemsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var item = new Item(Guid.NewGuid(), postItemRequest.Name, postItemRequest.Description, DateTime.Now, null);
+        var item = itemsService.AddItem(postItemRequest.Name, postItemRequest.Description);
 
         return CreatedAtAction(nameof(Get), new {id = item.Id}, item);
     }
 
+    /// <summary>
+    /// Updates an existing item.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="putItemRequest"></param>
+    /// <returns></returns>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(Item), 200)]
     [ProducesResponseType(400)]
@@ -80,16 +90,9 @@ public class ItemsController : ControllerBase
             return BadRequest("The id in the URL does not match the id in the request body.");
         }
 
-        if (!_items.TryGetValue(id, out var item)) return NotFound();
+        var (ok, updatedItem) = itemsService.UpdateItem(id, putItemRequest.Name, putItemRequest.Description);
+        if (!ok) return NotFound();
 
-        var updatedItem = item with
-        {
-            Name = putItemRequest.Name,
-            Description = putItemRequest.Description,
-            UpdatedAt = DateTime.Now
-        };
-
-        _items.TryUpdate(id, updatedItem, item);
         return Ok(updatedItem);
     }
 }
