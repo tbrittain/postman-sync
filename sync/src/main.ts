@@ -1,6 +1,8 @@
 import fs from 'fs'
 import * as path from "path";
 import {convert} from "./convert";
+import {pushCollectionToPostman} from "./push";
+import {retrieveSwaggerJson} from "./fetch";
 
 function loadEnv() {
     const defaultPath = path.join(__dirname, '../.env')
@@ -14,21 +16,6 @@ function loadEnv() {
         .config({path: defaultPath})
 }
 
-async function retrieveSwaggerJson(url: string) {
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    if (!response.ok) {
-        throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`)
-    }
-
-    // grab the string representation of the json rather than a json object
-    return await response.text()
-}
-
 async function main() {
     loadEnv()
 
@@ -39,9 +26,11 @@ async function main() {
     }
 
     const json = await retrieveSwaggerJson(url)
-    const result = await convert(json)
+    const parsedCollections = await convert(json)
 
-    console.log(result)
+    for (const collection of parsedCollections) {
+        await pushCollectionToPostman(collection)
+    }
 
     process.exit(0)
 }

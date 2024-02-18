@@ -5,7 +5,8 @@
   "description": "",
   "scripts": {
     "build": "npx tsc",
-    "dev": "nodemon ./src/main.ts"
+    "dev": "npx ts-node ./src/main.ts",
+    "dev:hmr": "nodemon ./src/main.ts"
   },
   "keywords": [],
   "author": "",

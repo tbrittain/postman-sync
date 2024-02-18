@@ -1,9 +1,10 @@
 import Converter, {Input} from "openapi-to-postmanv2";
 import util from "node:util";
+import {Collection} from "postman-collection";
 
 const promise = util.promisify(Converter.convert);
 
-export async function convert(json: string) {
+export async function convert(json: string): Promise<Collection[]> {
   const input: Input = {
     type: 'json',
     data: json,
@@ -14,5 +15,6 @@ export async function convert(json: string) {
     throw new Error(`Failed to convert: ${result.reason}`);
   }
 
-  return result;
+  return result.output
+    .map((collection) => new Collection(collection.data))
 }
