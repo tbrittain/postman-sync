@@ -2,15 +2,13 @@
   "name": "postman-sync",
   "private": true,
   "version": "1.0.0",
-  "description": "",
+  "description": "Queries a Swagger JSON doc, transforms and pushes it to a Postman collection",
   "scripts": {
     "build": "npx tsc",
     "dev": "npx ts-node ./src/main.ts",
     "dev:hmr": "nodemon ./src/main.ts"
   },
-  "keywords": [],
   "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.3",
     "@types/openapi-to-postmanv2": "^3.2.4",
