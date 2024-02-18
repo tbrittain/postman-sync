@@ -51,4 +51,9 @@ public class ItemsService
         _items.TryUpdate(id, updatedItem, item);
         return (true, updatedItem);
     }
+    
+    public bool DeleteItem(Guid id)
+    {
+        return _items.TryRemove(id, out _);
+    }
 }
