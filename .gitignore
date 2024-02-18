@@ -1,3 +1,5 @@
 ﻿/SampleApi/SampleApi/bin/
 /SampleApi/SampleApi/obj/
 /sync/node_modules/
+/sync/build/
+/sync/.env
