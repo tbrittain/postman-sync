@@ -9,11 +9,11 @@ namespace SampleApi.Controllers;
 /// </summary>
 /// <param name="itemsService"></param>
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class ItemsController(ItemsService itemsService) : ControllerBase
 {
     /// <summary>
-    /// Retrieves all items.
+    /// Get All Items
     /// </summary>
     /// <response code="200">Returns all items</response>
     /// <remarks>
@@ -32,7 +32,7 @@ public class ItemsController(ItemsService itemsService) : ControllerBase
     }
 
     /// <summary>
-    /// Gets a single item by its id.
+    /// Get Item
     /// </summary>
     /// <param name="id"></param>
     /// <response code="200">Returns the item</response>
@@ -52,7 +52,7 @@ public class ItemsController(ItemsService itemsService) : ControllerBase
     }
 
     /// <summary>
-    /// Adds a new item.
+    /// Post Item
     /// </summary>
     /// <param name="postItemRequest"></param>
     /// <remarks>
@@ -86,7 +86,7 @@ public class ItemsController(ItemsService itemsService) : ControllerBase
     }
 
     /// <summary>
-    /// Updates an existing item.
+    /// Put Item
     /// </summary>
     /// <param name="id"></param>
     /// <param name="putItemRequest"></param>
@@ -119,7 +119,7 @@ public class ItemsController(ItemsService itemsService) : ControllerBase
     }
 
     /// <summary>
-    /// Attempts to delete an item by its id.
+    /// Delete Item
     /// </summary>
     /// <param name="id"></param>
     /// <response code="204">The item was deleted</response>
@@ -139,7 +139,7 @@ public class ItemsController(ItemsService itemsService) : ControllerBase
     }
 
     /// <summary>
-    /// Gets a single item by its name.
+    /// Get Item by Name
     /// </summary>
     /// <param name="name"></param>
     /// <response code="200">Returns the item</response>

@@ -9,7 +9,10 @@ function loadEnv() {
     const defaultPath = path.join(__dirname, '../.env')
 
     if (!fs.existsSync(defaultPath)) {
-        logger.error(`.env file not found at %s`, defaultPath)
+        logger.crit({
+            message: 'No .env file found',
+            path: defaultPath
+        })
         process.exit(1)
     }
 
@@ -22,33 +25,47 @@ async function main() {
 
     const url = process.env.SWAGGER_JSON_URL
     if (!url) {
-        logger.error('SWAGGER_JSON_URL not found in .env')
+        logger.crit({
+            message: 'SWAGGER_JSON_URL not found in .env'
+        })
         process.exit(1)
     }
 
-    logger.info('Retrieving swagger json from %s', url)
+    logger.info({
+        message: 'Retrieving swagger json from url',
+        url
+    })
     const json = await retrieveSwaggerJson(url)
-    logger.info('Converting swagger json to postman collection metadata')
+    logger.info({
+        message: 'Converting swagger json to postman collection metadata'
+    })
     const collection = await convert(json)
 
     const existingCollectionId = process.env.POSTMAN_COLLECTION_ID
     if (existingCollectionId) {
-        logger.info('Updating existing collection with id %s', existingCollectionId)
+        logger.info({
+            message: 'Updating existing collection',
+            id: existingCollectionId
+        })
         const existingCollection = await getExistingPostmanCollection(existingCollectionId)
 
-        // TODO: Determine the merge strategy to use here, for now we'll just overwrite
         if (!existingCollection) {
-            logger.error('Failed to retrieve existing collection')
+            logger.error({
+                message: 'Collection not found',
+                id: existingCollectionId
+            })
             process.exit(1)
         }
 
-        // TODO: Here, call the PUT and update the collection
+        await pushCollectionToPostman(collection, existingCollectionId)
     } else {
-        logger.info('Creating new collection')
+        logger.info({
+            message: 'Creating new collection'
+        })
         await pushCollectionToPostman(collection)
     }
 
-    logger.info('Done')
+    logger.info({message: 'Done'})
     process.exit(0)
 }
 
