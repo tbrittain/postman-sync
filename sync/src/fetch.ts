@@ -1,39 +1,48 @@
-import {Collection} from "postman-collection";
-import {logger} from "./logger";
+import { Collection } from "postman-collection";
+import { logger } from "./logger";
 
 export async function retrieveSwaggerJson(url: string) {
   const response = await fetch(url, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+      "Content-Type": "application/json",
+    },
+  });
   if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`)
+    throw new Error(
+      `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+    );
   }
 
   // grab the string representation of the json rather than a json object
-  return await response.text()
+  return await response.text();
 }
 
-export async function getExistingPostmanCollection(collectionId: string): Promise<boolean> {
-  const postmanApiKey = process.env.POSTMAN_API_KEY
+export async function getExistingPostmanCollection(
+  collectionId: string,
+): Promise<boolean> {
+  const postmanApiKey = process.env.POSTMAN_API_KEY;
   if (!postmanApiKey) {
     logger.crit({
-      message: 'POSTMAN_API_KEY not found in .env'
-    })
-    process.exit(1)
+      message: "POSTMAN_API_KEY not found in .env",
+    });
+    process.exit(1);
   }
 
-  const response = await fetch(`https://api.getpostman.com/collections/${collectionId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Api-Key': postmanApiKey
-    }
-  })
+  const response = await fetch(
+    `https://api.getpostman.com/collections/${collectionId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": postmanApiKey,
+      },
+    },
+  );
   if (!response.ok) {
-    throw new Error(`Failed to fetch collection: ${response.status} ${response.statusText}`)
+    throw new Error(
+      `Failed to fetch collection: ${response.status} ${response.statusText}`,
+    );
   }
 
   const collection = (await response.json()).collection as Collection;
